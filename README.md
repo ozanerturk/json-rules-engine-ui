@@ -9,3 +9,4 @@ This example uses CND links, when you clone this repository you could see it isn
 It has very sensitive css definitions. So, be carefull when you play with design.
 
 I would be realy glad if there is someone who can simplfy this example. This is what I can do for now :)
+![preview](preview.PNG")
