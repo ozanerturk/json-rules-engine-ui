@@ -1,0 +1,163 @@
+<script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
+<script src="./rules.js"></script>
+<link rel="stylesheet" type="text/css" href="style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/draggable/1.0.0-beta.8/draggable.bundle.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.2/dragula.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.2/dragula.js"></script>
+
+<body>
+    <input type="button" value="generate Rule" onclick="GenerateRules()">
+    <div class="rule-definition">
+        <!-- It will render here-->
+    </div>
+    <div class="group-template" style="display:none">
+        <div class="options">
+            <div class="option-absolute">
+                <select>
+                    <option value="ALL">ALL</option>
+                    <option value="ANY">ANY</option>
+                </select>
+                <input type="button" class="insert-group" value="Add Group" onclick="addGroup(this)" />
+                <input type="button" class="insert-rule" value="Add Rule" onclick="addRule(this)" />
+                <input type="button" class="remove-group" value="Remove" onclick="removeGroup(this)" />
+                <button class="drag-handler">↑↓</button>
+            </div>
+        </div>
+        <div class="group-container">
+        </div>
+    </div>
+
+    <div class="rule-template" style="display:none">
+
+        FactName <select class="dropdown"><option>Operator</option></select> <input type="text" value="Value">
+        <input type="button" value="remove" onclick="removeRule(this)" />
+        <button class="drag-handler">↑↓</button>
+
+    </div>
+
+    <script>
+        var drake = dragula({
+            isContainer: function (el) {
+                return el.classList.contains('group-container');
+            },
+            moves: function (el, source, handle, sibling) {
+                if (handle.classList.contains('drag-handler')) return true;
+                return false;
+            },
+        });
+
+        function GenerateRules() {
+            var firstChildren = $(".rule-definition").children(".group");
+            var rule = generateRule(firstChildren);
+            var ruleStr = JSON.stringify(rule, null, 4);
+            alert("check Console!");
+            console.log(rule);
+            console.log(ruleStr);
+
+        }
+
+        function Generate(block) {
+            var data;
+            if ($(block).hasClass("rule")) {
+                return { fact: "f1", operator: "equals", value: 1 }
+            } else if ($(block).children(".options").find("select").val() == "ALL") {
+                var groupArray = $(block).children(".group-container").children(".group,.rule");
+                var data = [];
+                groupArray.each(function (i, e) {
+                    data.push(Generate($(e)));
+                });
+                return { all: data };
+            } else if ($(block).children(".options").find("select").val() == "ANY") {
+                var groupArray = $(block).children(".group-container").children(".group,.rule");
+                var data = [];
+                groupArray.each(function (i, e) {
+                    data.push(Generate($(e)));
+                });
+                return { any: data };
+            }
+        }
+        function addRule(e) {
+            var rule = $(".rule-template").clone();
+            rule.removeClass("rule-template");
+            rule.addClass("rule");
+            rule.show();
+            $(e).closest(".group").find(".group-container:first").append(rule);
+        }
+        function removeRule(e) {
+            $(e).closest(".rule").remove();
+
+        }
+        function removeGroup(e) {
+            var group = $(e).closest(".group");
+            if (group.find(".rule").length) {
+                alert("it has rules, first you need to remove them");
+            } else {
+                $(e).closest(".group").remove();
+            }
+        }
+        function addGroup(e) {
+            var existGroup = $(e).closest(".group");
+            var container = existGroup.find(".group-container:first");
+
+            var group = $(".group-template").clone();
+            group.removeClass("group-template");
+            group.addClass("group");
+            $(container).append(group);
+
+            $(group).show();
+        }
+
+        $(function () {
+            RenderRules();
+        })
+        function RenderRules() {
+
+            var html = Render(conditions);
+            $(".rule-definition").html(html);
+        }
+
+        function Render(data) {
+            if (Array.isArray(data)) {
+                var html = data.map(r => Render(r)).join("");
+                return html;
+            }
+            else {
+                var html = "";
+                if (data.all) { //'all' group
+                    var group = $(".group-template").clone();
+                    $(group).removeClass("group-template");
+                    $(group).addClass("group");
+                    $(group).show();
+                    $(group).find("select option[value='ALL']").attr("selected", "selected");
+                    var innerHtml = Render(data.all);
+                    $(group).find(".group-container").html(innerHtml);
+                    html = $(group)[0].outerHTML;
+                    $(group).remove();
+                }
+                if (data.any) { //'any' group 
+                    var group = $(".group-template").clone();
+                    $(group).removeClass("group-template");
+                    $(group).addClass("group");
+                    $(group).show();
+                    $(group).find("select option[value='ANY']").attr("selected", "selected");
+                    var innerHtml = Render(data.any);
+                    $(group).find(".group-container").html(innerHtml);
+                    html = $(group)[0].outerHTML;
+                    $(group).remove();
+
+                }
+                if (!data.all && !data.any) { // that means we have fact!
+
+                    var rule = $(".rule-template").clone();
+                    rule.removeClass("rule-template");
+                    rule.addClass("rule");
+                    rule.show();
+                    html = $(rule)[0].outerHTML;
+                    rule.remove();
+                }
+                return html;
+            }
+        }
+    </script>
+
+</body>
