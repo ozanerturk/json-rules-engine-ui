@@ -1,6 +1,6 @@
 # json-rules-engine-ui
 example rule definition ui for json-rules-engine
-
+DEMO https://ozanerturk.github.io/json-rules-engine-ui/
 
 From the begging, do not forget, it is only an example.
 
