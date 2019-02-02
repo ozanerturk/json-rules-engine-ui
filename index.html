@@ -48,7 +48,7 @@
 
         function GenerateRules() {
             var firstChildren = $(".rule-definition").children(".group");
-            var rule = generateRule(firstChildren);
+            var rule = Generate(firstChildren);
             var ruleStr = JSON.stringify(rule, null, 4);
             alert("check Console!");
             console.log(rule);
