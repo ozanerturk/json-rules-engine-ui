@@ -4,7 +4,7 @@ DEMO https://ozanerturk.github.io/json-rules-engine-ui/
 
 From the begging, do not forget, it is only an example.
 
-This example uses CND links, when you clone this repository you could see it isn't working. Consider to check cdn links.
+This example uses CND links, when you clone this repository you could see it doesn't work. Consider to check cdn links.
 
 It has very sensitive css definitions. So, be carefull when you play with design.
 
